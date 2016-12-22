@@ -27,25 +27,15 @@ def partsOfQuestion(string):
 
 		#print (splitQuestion)
 		
-		if ('which' in splitQuestion):
-			#which action - return one of the subjects 
-			action.append('which')
+		for i in questionWords:
+			
+			if (i in splitQuestion):
+				action.append(i)
 
-			#delete 'which' from the sentence
-			whichIndex = splitQuestion.index('which')
-			del splitQuestion[whichIndex]
+				#delete i from the sentence
+				del splitQuestion[splitQuestion.index(i)]
 
-			#print (splitQuestion)
-
-		if ('why' in splitQuestion):
-			#which action - return one of the subjects 
-			action.append('why')
-
-			#delete 'why' from the sentence
-			whyIndex = splitQuestion.index('why')
-			del splitQuestion[whyIndex]
-
-			#print (splitQuestion)
+				#print (splitQuestion)
 
 		compareIndex = -1
 
