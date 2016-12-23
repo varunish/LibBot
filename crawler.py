@@ -1,42 +1,44 @@
-class crawler:
-    #initialise the crawler with the name of database
-    def _init__(self,dbname):
-        pass
+from html.parser import HTMLParser
+from urllib.request import urlopen
+from urllib import parse
 
-    def _def__(self):
-        pass
+class LinkParser(HTMLParser):
 
-    def dbcommit(self):
-        pass
+    def handle_starttag(self,tag, attrs):
+        if tag=='a'
 
-    #auxillary function for getting an entry id and adding
-    #it if its not present
+        for (key,value) in attrs:
+            if key=='href':
+                newUrl=parse.urljoin(self.baseUrl,value)
+                self.links=self.links+[newUrl]
 
-    def getentryid(self,table,field,value,createnew=True):
-        return None
+    def getLinks(self,url):
+        self.links=[]
+        self.baseUrl=url
+        response=urlopen(url)
+        if response.getheader('Content-Type')=='text/html':
+            htmlBytes=response.read()
+            htmlString=htmlBytes.decode("utfj-8")
+            self.feed(htmlString)
+            return htmlString,self.links
+        else:
+            return "",[]
 
-    #Index an individual page
-    def addtoindex(self,url,soup):
-        print 'Indexing %s'%url
-
-    #Extract the text from an HTML page(no tags)
-    def gettextonly(self,soup):
-        return None
-    #Separate the words by any non-whitespace character
-    def separatewords(self,text):
-        return None
-    #Return true if this url is already indexed
-    def isindexed(self,url):
-        return False
-    #Add a link between two pages
-    def addlinkref(self,urlFrom,urlTo,linkText):
-        pass
-
-    #Starting with a list of pages , do a breadth
-    #first search to the given depth, indexing pages
-    #as we go
-    def crawl(self,pages,depth=2):
-        pass
-    #create the database tables
-    def createindextables(self):
-        pass
+def spider(url,word,maxPages):
+    gesToVisit=[url]
+    numberVisited=0
+    foundWord=False
+    while numberVisited<maxPages and pagesToVisit !=[] and not foundWord:
+        numberVisited=numberVisited+1
+        urll=pagesToVisit[0]
+        pagesToVisit=pagesToVisit[1:]
+        try:
+            print('visiting')
+            parser=LinkParser()
+            data,links=parser.getLinks(url)
+            if data.find(word)>-1
+                foundWord=True
+            PagesToVisit=pagesToVisit+links
+            print('success')
+        except:
+            print('failed')
