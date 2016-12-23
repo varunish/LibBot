@@ -2,6 +2,7 @@ from html.parser import HTMLParser
 from urllib.request import urlopen
 from urllib import parse
 from pyPdf import PdfFileReader
+import StringIO
 
 class LinkParser(HTMLParser):
 
@@ -68,4 +69,4 @@ def spider(url,word,maxPages):
             PagesToVisit=pagesToVisit+links
             print('success')
         except:
-            pring('failed')
+            print('failed')
