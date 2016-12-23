@@ -1,6 +1,7 @@
 from html.parser import HTMLParser
 from urllib.request import urlopen
 from urllib import parse
+from pyPdf import PdfFileReader
 
 class LinkParser(HTMLParser):
 
@@ -11,16 +12,42 @@ class LinkParser(HTMLParser):
             if key=='href':
                 newUrl=parse.urljoin(self.baseUrl,value)
                 self.links=self.links+[newUrl]
+    def get_pdf_text(self, response):
+        """ Peek inside PDF to check possible violations."""
+
+        
+
+        
+
+        stream = StringIO.StringIO(response.body)
+        reader = PdfFileReader(stream)
+
+        text = ""
+
+        
+
+        for page in reader.pages:
+                # XXX: Does handle unicode properly?
+                text += page.extractText()
+
+        return text
 
     def getLinks(self,url):
         self.links=[]
         self.baseUrl=url
         response=urlopen(url)
-        if response.getheader('Content-Type')=='text/html':
-            htmlBytes=response.read()
-            htmlString=htmlBytes.decode("utfj-8")
-            self.feed(htmlString)
-            return htmlString,self.links
+        ct = response.headers.get("content-type", "").lower()
+        if "pdf" in ct:
+                # Assume a PDF file
+                data = self.get_pdf_text(response)
+        else:
+                # Assume it's HTML
+                data = response.body
+        #if response.getheader('Content-Type')=='text/html':
+            #htmlBytes=response.read()
+            #htmlString=htmlBytes.decode("utfj-8")
+            #self.feed(htmlString)
+            return data,self.links
         else:
             return "",[]
 
@@ -41,4 +68,4 @@ def spider(url,word,maxPages):
             PagesToVisit=pagesToVisit+links
             print('success')
         except:
-            print('failed')
+            pring('failed')
