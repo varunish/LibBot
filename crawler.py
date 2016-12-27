@@ -1,18 +1,18 @@
 from html.parser import HTMLParser
 from urllib.request import urlopen
 from urllib import parse
-from pyPdf import PdfFileReader
-import StringIO
+from PyPDF2 import PdfFileReader
+from io import StringIO
 
 class LinkParser(HTMLParser):
 
     def handle_starttag(self,tag, attrs):
-        if tag=='a'
-
-        for (key,value) in attrs:
-            if key=='href':
-                newUrl=parse.urljoin(self.baseUrl,value)
-                self.links=self.links+[newUrl]
+        if tag=='a':
+            for (key,value) in attrs:
+                if key=='href':
+                    newUrl=parse.urljoin(self.baseUrl,value)
+                    self.links=self.links+[newUrl]
+    
     def get_pdf_text(self, response):
         """ Peek inside PDF to check possible violations."""
 
@@ -48,12 +48,10 @@ class LinkParser(HTMLParser):
             #htmlBytes=response.read()
             #htmlString=htmlBytes.decode("utfj-8")
             #self.feed(htmlString)
-            return data,self.links
-        else:
-            return "",[]
+                return data,self.links
 
 def spider(url,word,maxPages):
-    gesToVisit=[url]
+    pagesToVisit=[url]
     numberVisited=0
     foundWord=False
     while numberVisited<maxPages and pagesToVisit !=[] and not foundWord:
@@ -64,9 +62,11 @@ def spider(url,word,maxPages):
             print('visiting')
             parser=LinkParser()
             data,links=parser.getLinks(url)
-            if data.find(word)>-1
+            if data.find(word)>-1:
                 foundWord=True
-            PagesToVisit=pagesToVisit+links
+            pagesToVisit=pagesToVisit+links
             print('success')
         except:
             print('failed')
+
+spider("www.google.com","web",100)
