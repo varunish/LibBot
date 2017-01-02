@@ -1,7 +1,7 @@
 #way to execute
 
 #>>import search
-#>> pagelist=['type ur url']
+#>> pagelist=['type ur url']4
 #>> crawler=searchengine.crawler('')
 #>> crawler.crawl(pagelist)
 
@@ -13,18 +13,18 @@
 #>> e=searchengine.searcher('searchindex.db')
 #>> e.query('functional programming')
 
-#packages you need urllib, BeautifulSoup, pysqlite2
+#packages you need urllib, BeautifulSoup, pysqlite32
 
 import urllib.request
-from BeautifulSoup import *
+from bs4 import *
 from urllib.parse import urlparse
-from pysqlite2 import dbapi2 as sqlite
+from sqlite3 import dbapi2 as sqlite3
 
 ignorewords=set(['the','of','to','and','a','in','is','it'])
 
 class crawler:
     def __init__(self,dbname):
-        self.con=sqlite.connect(dbname)
+        self.con=sqlite3.connect(dbname)
 
     def __del__(self):
         self.con.close()
@@ -105,7 +105,7 @@ class crawler:
                 except:
                     print("could not open %s" %page)
                     continue
-                soup=BeautifulSoup(c.read())
+                soup=BeautifulSoup(c.read(), "lxml")
                 self.addtoindex(page,soup)
 
                 links=soup('a')
@@ -140,7 +140,7 @@ class crawler:
         
 class searcher:
     def __init__(self,dbname):
-        self.con=sqlite.connect(dbname)
+        self.con=sqlite3.connect(dbname)
 
     def __del__(self):
         self.con.close()
@@ -179,7 +179,7 @@ class searcher:
 
     def getscoredlist(self,rows,wordids):
 
-        totalscores=dict([row[0],0) for row in rows])
+        totalscores=dict([(row[0],0) for row in rows])
 
         #this is where we will put the scoring fucntion
 
@@ -199,7 +199,7 @@ class searcher:
         scores=self.getscoredlist(rows,wordids)
         rankedscores=sorted([(score,url) for (url,score) in scores.items()],reverse=1)
         for (score,urlid) in rankedscores[0:10]:
-            print('%f \t %s' %(score,self.geturlname(urlid))
+            print('%f \t %s' %(score,self.geturlname(urlid)))
 
     def normalizescores(self,scores,smallIsBetter=0):
         vsmall=0.00001 #avoid div by 0 err
@@ -233,7 +233,3 @@ class searcher:
 #>>reload(search)
 #>> e=searchengine.searcher('searchindex.db')
 #>> e.query('functional programming')
-                  
-                            
-        
-    
