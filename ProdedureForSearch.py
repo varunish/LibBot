@@ -1,3 +1,8 @@
+Packages you need:
+  BeautifulSoup
+  lxml
+  
+
 The steps to execute search.py
 >>>import search
 >>>crawler=search1.crawler('new.db')
