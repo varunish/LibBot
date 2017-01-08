@@ -8,13 +8,17 @@ import re
 ignorewords=set(['the','of','to','and','a','in','is','it'])
 
 class crawler:
+    
     # Initialize the crawler with the name of database
     def __init__(self,dbname):
         self.con=sqlite3.connect(dbname)
+        
     def __del__(self):
         self.con.close()
+        
     def dbcommit(self):
         self.con.commit()
+        
     # Auxilliary function for getting an entry id and adding
     # it if it's not present
     def getentryid(self,table,field,value,createnew=True):
@@ -28,18 +32,22 @@ class crawler:
             return cur.lastrowid
         else:
             return res[0]
+        
     # Index an individual page
     def addtoindex(self,url,soup):
         #print('Indexing %s' %url)
         if self.isindexed(url):
             return
         print('Indexing '+url)
-
+        
+        #get individual words
         text=self.gettextonly(soup)
         words=self.separatewords(text)
-
+        
+        #get the url id of the words
+        
         urlid=self.getentryid('urllist','url',url)
-
+        
         for i in range(len(words)):
             word=words[i]
             if word in ignorewords:
@@ -47,6 +55,7 @@ class crawler:
             wordid=self.getentryid('wordlist','word',word)
             c=self.con.cursor()
             c.execute("INSERT INTO wordlocation(urlid,wordid,location) VALUES (%d,%d,%d)" %(urlid,wordid,i))
+            
     # Extract the text from an HTML page (no tags)
     def gettextonly(self,soup):
         v=soup.string
@@ -60,6 +69,7 @@ class crawler:
             return resulttext
         else:
             return v.strip()
+        
     # Separate the words by any non-whitespace character
     def separatewords(self,text):
         splitter=re.compile('\\W*')
@@ -76,14 +86,17 @@ class crawler:
             if v!=None:
                 return True
             return False
+        
     # Add a link between two pages
     def addlinkref(self,urlFrom,urlTo,linkText):
         pass
+    
     # Starting with a list of pages, do a breadth
     # first search to the given depth, indexing pages
     # as we go
     def crawl(self,depth=2):
-        pages=['http://brickset.com/sets/year-2016']
+        pages=['http://brickset.com/sets/year-2016'] #This is the list which will store the links to all the pages
+        
         for i in range(depth):
             newpages=set()
             for page in pages:
@@ -92,11 +105,15 @@ class crawler:
                 except:
                     print("could not open %s" %page)
                     continue
+                    
+                #read the contents of the HTML using lxml parser
                 soup=BeautifulSoup(c.read(), "lxml")
                 #soup=BeautifulSoup(c.read())
                 self.addtoindex(page,soup)
 
                 links=soup('a')
+                
+                #a loop to get the url's from the parent website
                 for link in links:
                     if('href' in dict(link.attrs)):
                         url=urllib.parse.urljoin(page,link['href'])
@@ -113,7 +130,7 @@ class crawler:
             pages=newpages
        
         
-    # Create the database tables
+    # Create the database tables, just SQL stuff
     def createindextables(self):
         c=self.con.cursor()
         c.execute('CREATE TABLE urllist(url)')
@@ -127,7 +144,10 @@ class crawler:
         c.execute('CREATE INDEX urltoidx on link(toid)')
         c.execute('CREATE INDEX urlfromidx on link(fromid)')
         self.dbcommit()
+
+#a class which let's you do search queries, more of SQL stuff      
 class searcher:
+    
     def __init__(self,dbname):
         self.con=sqlite3.connect(dbname)
 
@@ -191,6 +211,7 @@ class searcher:
         for (score,urlid) in rankedscores[0:10]:
             print('%f \t %s' %(score,self.geturlname(urlid)))
 
+    #just math to give a score for a webpage from 0 to 1 based on the frequency of words in it
     def normalizescores(self,scores,smallIsBetter=0):
         vsmall=0.00001 #avoid div by 0 err
         if smallIsBetter:
@@ -201,6 +222,7 @@ class searcher:
             if maxscore==0:
                   maxscore=vsmall
             return dict([(u,float(c)/maxscore) for (u,c) in scores.items( )])
+        
     def frequencyscore(self,rows):
         counts=dict([(row[0],0) for row in rows])
         for row in rows:
