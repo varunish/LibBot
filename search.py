@@ -94,6 +94,8 @@ class crawler:
     # Starting with a list of pages, do a breadth
     # first search to the given depth, indexing pages
     # as we go
+    
+    #def crawl loops through the list of pages , calling addtoindex on each one, it uses beautifulsoup to get all the links 
     def crawl(self,depth=2):
         pages=['http://brickset.com/sets/year-2016'] #This is the list which will store the links to all the pages
         
