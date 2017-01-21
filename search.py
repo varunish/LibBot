@@ -4,8 +4,9 @@ from urllib.parse import urlparse
 #from sqlite3 import dbapi2 as sqlite3
 import sqlite3
 import re
+from nltk.corpus import stopwords
 
-ignorewords=set(['the','of','to','and','a','in','is','it'])
+ignorewords=set(stopwords.words('english'))
 
 class crawler:
     
