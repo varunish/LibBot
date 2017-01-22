@@ -98,16 +98,12 @@ class crawler:
     
     #def crawl loops through the list of pages , calling addtoindex on each one, it uses beautifulsoup to get all the links 
     def crawl(self,depth=2):
-        pages=['http://brickset.com/sets/year-2016'] #This is the list which will store the links to all the pages
+        pages=[] #put starting page directory here. Use relative addressing
+        #This is the list which will store the links to all the pages
         
         for i in range(depth):
-            newpages=set()
             for page in pages:
-                try:
-                    c=urllib.request.urlopen(page)
-                except:
-                    print("could not open %s" %page)
-                    continue
+                c = open(page)
                     
                 #read the contents of the HTML using lxml parser
                 soup=BeautifulSoup(c.read(), "lxml")
@@ -119,20 +115,11 @@ class crawler:
                 #a loop to get the url's from the parent website
                 for link in links:
                     if('href' in dict(link.attrs)):
-                        url=urllib.parse.urljoin(page,link['href'])
-                        if url.find("'")!=-1 :
-                            continue
-                        url=url.split('#')[0]
-                        if url[0:4]=='http' and not self.isindexed(url):
-                            newpages.add(url)
+                        pages.append(link['href'])
                         linkText=self.gettextonly(link)
-                        self.addlinkref(page,url,linkText)
-
-                self.dbcommit()
-
-            pages=newpages
-       
-        
+                        self.addlinkref(page,pages[-1],linkText) 
+                    self.dbcommit()
+    
     # Create the database tables, just SQL stuff
     def createindextables(self):
         c=self.con.cursor()
